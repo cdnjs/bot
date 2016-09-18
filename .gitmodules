@@ -1,0 +1,6 @@
+[submodule "3-party/ColorEcho"]
+	path = 3-party/ColorEcho
+	url = https://github.com/PeterDaveHello/ColorEchoForShell.git
+[submodule "3-party/zopfli"]
+	path = 3-party/zopfli
+	url = https://github.com/google/zopfli.git
