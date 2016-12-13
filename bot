@@ -30,7 +30,7 @@ export GIT_COMMITTER_NAME="$userName"
 export GIT_COMMITTER_EMAIL="$userEmail"
 export GIT_SSH=/home/peter/.ssh/ssh-git.sh
 
-. "${basePath}/script/commonSciprt.sh" || exit
+. "${basePath}/script/commonScript.sh" || exit
 
 function log() {
     echo "$@" >> ${basePath}/bot.log
