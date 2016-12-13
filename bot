@@ -47,16 +47,22 @@ do
     StartTimestamp="$(date +%s)"
     print-log "Start time: $(date)"
     cd ${basePath}/cdnjs
+    CurrentCommit="$(git log -1 --oneline)"
     git diff --exit-code > /dev/null || (autoadd)
     run git pull --rebase origin master
     run timelimit -q -s 9 -t 1200 -T 1230 npm install
     run timelimit -q -s 9 -t 1200 -T 1230 npm update
     run timelimit -q -s 9 -t 1200 -T 1230 ./auto-update.js run &
     run ${basePath}/autoupdate/autoupdate.js
-    autoadd
-    run git pull --rebase origin master
-    run git push && run git push gitlab master --no-verify
-    run git status
+    (autoadd)
+    if [ "${CurrentCommit}" = "$(git log -1 --oneline)" ]; then
+        print-log "No update detected, bypass pull & push operation"
+    else
+        print-log "Update detected, now run pull & push operation"
+        run git pull --rebase origin master
+        run git push && run git push gitlab master --no-verify
+        run git status
+    fi
     EndTimestamp="$(date +%s)"
     spent="$((EndTimestamp - StartTimestamp))"
     echo -e "\nTotal time spent for this build is _${spent}_ second(s)\n"
