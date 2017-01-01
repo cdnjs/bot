@@ -48,6 +48,9 @@ do
     print-log "Start time: $(date)"
     cd ${basePath}/cdnjs
     CurrentCommit="$(git log -1 --oneline)"
+    if [ "$(git branch | command grep ^* | awk '{print $2}')" != "master" ]; then
+        git checlout -f master
+    fi
     git diff --exit-code > /dev/null || (autoadd)
     run git pull --rebase origin master
     run timelimit -q -s 9 -t 1200 -T 1230 npm install
