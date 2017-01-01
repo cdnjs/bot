@@ -71,7 +71,7 @@ do
     echo -e "\nTotal time spent for this build is _${spent}_ second(s)\n"
     print-log "End time: $(date)"
     print-log "Spent $spent second ..."
-    sleepSecs=$((720 - spent))
+    sleepSecs=$((600 - spent))
     [[ $sleepSecs -le 60 ]] && sleepSecs=60
     run sleep $sleepSecs
 done
