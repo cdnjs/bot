@@ -63,7 +63,7 @@ do
     else
         print-log "Update detected, now run pull & push operation"
         run git pull --rebase origin master
-        run git push --tags && run git push --tags gitlab master --no-verify
+        run git push --tags origin master && run git push --tags gitlab master --no-verify
         run git status
     fi
     EndTimestamp="$(date +%s)"
