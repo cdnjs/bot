@@ -66,6 +66,8 @@ do
         run git push --tags origin master && run git push --tags gitlab master --no-verify
         run git status
     fi
+    print-log "Clean up ..."
+    rm -rf /run/shm/cdnjsCheck/  /run/shm/cdnjs_NPM_temp/
     EndTimestamp="$(date +%s)"
     spent="$((EndTimestamp - StartTimestamp))"
     echo -e "\nTotal time spent for this build is _${spent}_ second(s)\n"
