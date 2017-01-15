@@ -41,6 +41,10 @@ function print-log() {
     echo "$@"
 }
 
+if ! type cowsay &> /dev/null; then
+    alias cowsay="echo"
+fi
+
 while true
 do
     cowsay "Hi, I'm cdnjs bot"
