@@ -74,6 +74,9 @@ do
     print-log "End time: $(date)"
     print-log "Spent $spent second ..."
     sleepSecs=$((600 - spent))
-    [[ $sleepSecs -le 60 ]] && sleepSecs=60
+    while [[ $sleepSecs -le 1 ]]
+    do
+        sleepSecs=$((600 + sleepSecs))
+    done
     run sleep $sleepSecs
 done
