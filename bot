@@ -53,7 +53,7 @@ do
     cd ${basePath}/cdnjs
     CurrentCommit="$(git log -1 --oneline)"
     if [ "$(git branch | command grep ^* | awk '{print $2}')" != "master" ]; then
-        git checlout -f master
+        git checkout -f master
     fi
     git diff --exit-code > /dev/null || (autoadd)
     run git pull --rebase origin master
