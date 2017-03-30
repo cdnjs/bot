@@ -33,7 +33,7 @@ export GIT_SSH="$HOME/.ssh/ssh-git.sh"
 . "${basePath}/script/commonScript.sh" || exit
 
 function log() {
-    echo "$@" >> ${basePath}/bot.log
+    echo "$@" >> "${basePath}/bot.log"
 }
 
 function print-log() {
@@ -50,7 +50,7 @@ do
     cowsay "Hi, I'm cdnjs bot"
     StartTimestamp="$(date +%s)"
     print-log "Start time: $(date)"
-    cd ${basePath}/cdnjs
+    cd "${basePath}/cdnjs"
     CurrentCommit="$(git log -1 --oneline)"
     if [ "$(git branch | command grep ^* | awk '{print $2}')" != "master" ]; then
         git checkout -f master
@@ -60,7 +60,7 @@ do
     run timelimit -q -s 9 -t 1200 -T 1230 npm install
     run timelimit -q -s 9 -t 1200 -T 1230 npm update
     run timelimit -q -s 9 -t 1200 -T 1230 ./auto-update.js run &
-    run ${basePath}/autoupdate/autoupdate.js
+    run "${basePath}/autoupdate/autoupdate.js"
     (autoadd)
     if [ "${CurrentCommit}" = "$(git log -1 --oneline)" ]; then
         print-log "No update detected, bypass pull & push operation"
