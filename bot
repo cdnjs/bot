@@ -5,12 +5,11 @@ NVM_DIR="$HOME/.nvm"
 basePath="$HOME/repos/cdnjs"
 
 if [ -s "$NVM_DIR/nvm.sh" ] && ! command -v nvm &> /dev/null ; then
-    . "$NVM_DIR/nvm.sh"
+    . "$NVM_DIR/nvm.sh" --no-use
 fi
 
 if command -v nvm &> /dev/null ; then
     nvm install 4
-    nvm use --delete-prefix v4
     echo "nvm version: $(nvm --version)"
 fi
 
