@@ -2,7 +2,7 @@
 . ~/.bashrc
 
 NVM_DIR="$HOME/.nvm"
-basePath="/home/peter/repos/cdnjs"
+basePath="$HOME/repos/cdnjs"
 
 if [ -s "$NVM_DIR/nvm.sh" ] && ! command -v nvm &> /dev/null ; then
     . "$NVM_DIR/nvm.sh"
@@ -28,7 +28,7 @@ export GIT_AUTHOR_NAME="$userName"
 export GIT_AUTHOR_EMAIL="$userEmail"
 export GIT_COMMITTER_NAME="$userName"
 export GIT_COMMITTER_EMAIL="$userEmail"
-export GIT_SSH=/home/peter/.ssh/ssh-git.sh
+export GIT_SSH="$HOME/.ssh/ssh-git.sh"
 
 . "${basePath}/script/commonScript.sh" || exit
 
