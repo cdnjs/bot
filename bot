@@ -13,6 +13,7 @@ if command -v nvm &> /dev/null ; then
     echo "nvm version: $(nvm --version)"
 fi
 
+echo "git($(which git)) version: $(git --version | awk '{print $3}')"
 echo "npm($(which npm)) version: $(npm --version)"
 echo "node($(which node)) version: $(node --version)"
 
