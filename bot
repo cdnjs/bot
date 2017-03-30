@@ -13,8 +13,8 @@ if command -v nvm &> /dev/null ; then
     echo "nvm version: $(nvm --version)"
 fi
 
-echo "npm version: $(npm --version)"
-echo "node version: $(node --version)"
+echo "npm($(which npm)) version: $(npm --version)"
+echo "node($(which node)) version: $(node --version)"
 
 if [ "$1" = "debug" ]; then
     set -x
