@@ -56,7 +56,10 @@ do
         git checkout -f master
     fi
     git diff --exit-code > /dev/null || (autoadd)
-    run git pull --rebase origin master
+    run git fetch origin master
+    if [ "$(run git log --oneline -1 origin/master)" != "$(run git log --oneline -1 master)" ] ; then
+        run_retry git rebase origin/master master
+    fi
     run timelimit -q -s 9 -t 180 -T 200 npm install --prefix "${basePath}/autoupdate" && run "${basePath}/autoupdate/autoupdate.js" &
     run timelimit -q -s 9 -t 180 -T 200 npm install && run timelimit -q -s 9 -t 1200 -T 1230 ./auto-update.js run &
     wait
@@ -65,7 +68,10 @@ do
         print-log "No update detected, bypass pull & push operation"
     else
         print-log "Update detected, now run pull & push operation"
-        run git pull --rebase origin master
+        run git fetch origin master
+        if [ "$(run git log --oneline -1 origin/master)" != "$(run git log --oneline -1 master)" ] ; then
+            run git rebase origin/master master
+        fi
         run git push --tags origin master && run git push --tags gitlab master --no-verify
         run git status
     fi
