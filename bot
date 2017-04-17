@@ -55,7 +55,7 @@ do
     if [ "$(git branch | command grep ^* | awk '{print $2}')" != "master" ]; then
         git checkout -f master
     fi
-    git diff --exit-code > /dev/null || (autoadd)
+    git diff --quiet || (autoadd)
     run git fetch origin master
     if [ "$(run git log --oneline -1 origin/master)" != "$(run git log --oneline -1 master)" ] ; then
         run_retry git rebase origin/master master
