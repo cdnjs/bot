@@ -68,9 +68,9 @@ do
         print-log "No update detected, bypass pull & push operation"
     else
         print-log "Update detected, now run pull & push operation"
-        OLD_MASTER=$(run git log --oneline -1 origin/master)
+        OLD_MASTER="$(git log --oneline -1 origin/master)"
         run git fetch origin master
-        NEW_MASTER=$(run git log --oneline -1 origin/master)
+        NEW_MASTER="$(git log --oneline -1 origin/master)"
         if [ "${NEW_MASRER}" != "${OLD_MASTER}" ] ; then
             print-log "Remote master branch update detected! Update local branch!"
             run git rebase origin/master master
