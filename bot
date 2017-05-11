@@ -75,8 +75,8 @@ do
             print-log "Remote master branch update detected! Update local branch!"
             run git rebase origin/master master
         fi
-        run git push --tags origin master && run git push --tags gitlab master --no-verify
-        run git fetch origin master &
+        run git push --tags origin master || run git pull --rebase origin master
+        run git push --tags gitlab master --no-verify
         run git status
     fi
     print-log "Clean up ..."
