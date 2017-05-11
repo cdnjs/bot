@@ -68,6 +68,7 @@ do
         print-log "No update detected, bypass pull & push operation"
     else
         print-log "Update detected, now run pull & push operation"
+        PUSHED=false
         OLD_MASTER="$(git log --oneline -1 origin/master)"
         run git fetch origin master
         NEW_MASTER="$(git log --oneline -1 origin/master)"
@@ -75,8 +76,14 @@ do
             print-log "Remote master branch update detected! Update local branch!"
             run git rebase origin/master master
         fi
-        run git push --tags origin master || run git pull --rebase origin master
-        run git push --tags gitlab master --no-verify
+        run git push --tags origin master && PUSHED=true
+        if [ ${PUSHED} = false ]; then
+            run git pull --rebase origin master
+            run git push --tags origin master && PUSHED=true
+        fi
+        if [ ${PUSHED} = true ]; then
+            run git push --tags gitlab master --no-verify
+        fi
         run git status
     fi
     print-log "Clean up ..."
