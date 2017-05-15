@@ -57,7 +57,7 @@ do
     fi
     git diff --quiet || (autoadd)
     run git fetch origin master
-    if [ "$(run git log --oneline -1 origin/master)" != "$(run git log --oneline -1 master)" ] ; then
+    if [ "$(git log --oneline -1 origin/master)" != "$(git log --oneline -1 master)" ] ; then
         run git rebase origin/master master
     fi
     run timelimit -q -s 9 -t 180 -T 200 npm install --prefix "${basePath}/autoupdate" && run "${basePath}/autoupdate/autoupdate.js" &
