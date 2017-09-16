@@ -98,5 +98,8 @@ do
     do
         sleepSecs=$((480 + sleepSecs))
     done
+    if [ "$(date +%a)" = "Sun" ] || [ "$(date +%a)" = "Sat" ]; then
+        sleepSecs=$((300 + sleepSecs))
+    fi
     run sleep $sleepSecs
 done
