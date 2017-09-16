@@ -73,6 +73,8 @@ do
         run git fetch origin master
         NEW_MASTER="$(git log --oneline -1 origin/master)"
         if [ "${NEW_MASTER}" != "${OLD_MASTER}" ] ; then
+            print-log "old :$OLD_MASTER"
+            print-log "new :$NEW_MASTER"
             print-log "Remote master branch update detected! Update local branch!"
             run git rebase origin/master master
         fi
