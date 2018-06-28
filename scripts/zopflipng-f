@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-if [ $# -eq 1 ]; then
-    zopflipng --iterations=60 --keepchunks=iCCP --lossy_transparent --splitting=3 -my "$1" "$1"
-else
-    return 1
+
+if [ $# -ne 1 ]; then
+  return 1
 fi
+
+zopflipng --iterations=60 --keepchunks=iCCP --lossy_transparent --splitting=3 -my "$1" "$1"

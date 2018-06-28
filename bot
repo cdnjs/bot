@@ -4,104 +4,102 @@
 NVM_DIR="$HOME/.nvm"
 basePath="$HOME/repos/cdnjs"
 
-if [ -s "$NVM_DIR/nvm.sh" ] && ! command -v nvm &> /dev/null ; then
-    . "$NVM_DIR/nvm.sh" --no-use
+if [ -s "$NVM_DIR/nvm.sh" ] && ! command -v nvm &> /dev/null; then
+  . "$NVM_DIR/nvm.sh" --no-use
 fi
 
-if command -v nvm &> /dev/null ; then
-    nvm install 8
-    echo "nvm version: $(nvm --version)"
+if command -v nvm &> /dev/null; then
+  nvm install 8
+  echo "nvm version: $(nvm --version)"
 fi
 
-echo "git($(which git)) version: $(git --version | awk '{print $3}')"
-echo "npm($(which npm)) version: $(npm --version)"
-echo "node($(which node)) version: $(node --version)"
+echo "git($(command -v git)) version: $(git --version | awk '{print $3}')"
+echo "npm($(command -v npm)) version: $(npm --version)"
+echo "node($(command -v node)) version: $(node --version)"
 
 if [ "$1" = "debug" ]; then
-    set -x
-    export GIT_TRACE=true
+  set -x
+  export GIT_TRACE=true
 fi
 
 userName="PeterBot"
 userEmail="PeterBot@users.noreply.github.com"
-export GIT_AUTHOR_NAME="$userName"
-export GIT_AUTHOR_EMAIL="$userEmail"
-export GIT_COMMITTER_NAME="$userName"
-export GIT_COMMITTER_EMAIL="$userEmail"
+export GIT_AUTHOR_NAME="${userName}"
+export GIT_AUTHOR_EMAIL="${userEmail}"
+export GIT_COMMITTER_NAME="${userName}"
+export GIT_COMMITTER_EMAIL="${userEmail}"
 export GIT_SSH="$HOME/.ssh/ssh-git.sh"
 
 . "${basePath}/script/commonScript.sh" || exit
 
 function log() {
-    echo "$@" >> "${basePath}/bot.log"
+  echo "$@" >> "${basePath}/bot.log"
 }
 
 function print-log() {
-    log "$@"
-    echo "$@"
+  log "$@"
+  echo "$@"
 }
 
 if ! type cowsay &> /dev/null; then
-    alias cowsay="echo"
+  alias cowsay="echo"
 fi
 
-while true
-do
-    cowsay "Hi, I'm cdnjs bot"
-    StartTimestamp="$(date +%s)"
-    print-log "Start time: $(date)"
-    cd "${basePath}/cdnjs"
-    CurrentCommit="$(git log -1 --oneline)"
-    if [ "$(git branch | command grep ^* | awk '{print $2}')" != "master" ]; then
-        git checkout -f master
-    fi
-    git diff --quiet || (autoadd)
+while true; do
+  cowsay "Hi, I'm cdnjs bot"
+  StartTimestamp="$(date +%s)"
+  print-log "Start time: $(date)"
+  cd "${basePath}/cdnjs"
+  CurrentCommit="$(git log -1 --oneline)"
+  if [ "$(git branch | command grep ^* | awk '{print $2}')" != "master" ]; then
+    git checkout -f master
+  fi
+  git diff --quiet || (autoadd)
+  run git fetch origin master
+  if [ "$(git log --oneline -1 origin/master)" != "$(git log --oneline -1 master)" ]; then
+    run git rebase origin/master master
+  fi
+  run timelimit -q -s 9 -t 180 -T 200 npm install --prefix "${basePath}/autoupdate" && run "${basePath}/autoupdate/autoupdate.js" &
+  run timelimit -q -s 9 -t 180 -T 200 npm install && run timelimit -q -s 9 -t 1200 -T 1230 ./auto-update.js run &
+  wait
+  (autoadd)
+  if [ "${CurrentCommit}" = "$(git log -1 --oneline)" ]; then
+    print-log "No update detected, bypass pull & push operation"
+  else
+    print-log "Update detected, now run pull & push operation"
+    PUSHED=false
+    OLD_MASTER="$(git log --oneline -1 origin/master)"
     run git fetch origin master
-    if [ "$(git log --oneline -1 origin/master)" != "$(git log --oneline -1 master)" ] ; then
-        run git rebase origin/master master
+    NEW_MASTER="$(git log --oneline -1 origin/master)"
+    if [ "${NEW_MASTER}" != "${OLD_MASTER}" ]; then
+      print-log "old :${OLD_MASTER}"
+      print-log "new :${NEW_MASTER}"
+      print-log "Remote master branch update detected! Update local branch!"
+      run git rebase origin/master master
     fi
-    run timelimit -q -s 9 -t 180 -T 200 npm install --prefix "${basePath}/autoupdate" && run "${basePath}/autoupdate/autoupdate.js" &
-    run timelimit -q -s 9 -t 180 -T 200 npm install && run timelimit -q -s 9 -t 1200 -T 1230 ./auto-update.js run &
-    wait
-    (autoadd)
-    if [ "${CurrentCommit}" = "$(git log -1 --oneline)" ]; then
-        print-log "No update detected, bypass pull & push operation"
-    else
-        print-log "Update detected, now run pull & push operation"
-        PUSHED=false
-        OLD_MASTER="$(git log --oneline -1 origin/master)"
-        run git fetch origin master
-        NEW_MASTER="$(git log --oneline -1 origin/master)"
-        if [ "${NEW_MASTER}" != "${OLD_MASTER}" ] ; then
-            print-log "old :$OLD_MASTER"
-            print-log "new :$NEW_MASTER"
-            print-log "Remote master branch update detected! Update local branch!"
-            run git rebase origin/master master
-        fi
-        run git push --tags origin master && PUSHED=true
-        if [ ${PUSHED} = false ]; then
-            run git pull --rebase origin master
-            run git push --tags origin master && PUSHED=true
-        fi
-        if [ ${PUSHED} = true ]; then
-            run git push --tags gitlab master --no-verify
-        fi
-        run git status
+    run git push --tags origin master && PUSHED=true
+    if [ ${PUSHED} = false ]; then
+      run git pull --rebase origin master
+      run git push --tags origin master && PUSHED=true
     fi
-    print-log "Clean up ..."
-    rm -rf /run/shm/cdnjsCheck/  /run/shm/cdnjs_NPM_temp/
-    EndTimestamp="$(date +%s)"
-    spent="$((EndTimestamp - StartTimestamp))"
-    echo -e "\nTotal time spent for this build is _${spent}_ second(s)\n"
-    print-log "End time: $(date)"
-    print-log "Spent $spent second ..."
-    sleepSecs=$((480 - spent))
-    while [[ $sleepSecs -le 60 ]]
-    do
-        sleepSecs=$((480 + sleepSecs))
-    done
-    if [ "$(date +%a)" = "Sun" ] || [ "$(date +%a)" = "Sat" ]; then
-        sleepSecs=$((300 + sleepSecs))
+    if [ ${PUSHED} = true ]; then
+      run git push --tags gitlab master --no-verify
     fi
-    run sleep $sleepSecs
+    run git status
+  fi
+  print-log "Clean up ..."
+  rm -rf /run/shm/cdnjsCheck/ /run/shm/cdnjs_NPM_temp/
+  EndTimestamp="$(date +%s)"
+  spent="$((EndTimestamp - StartTimestamp))"
+  echo -e "\\nTotal time spent for this build is _${spent}_ second(s)\\n"
+  print-log "End time: $(date)"
+  print-log "Spent ${spent} second ..."
+  sleepSecs=$((480 - spent))
+  while [[ "${sleepSecs}" -le 60 ]]; do
+    sleepSecs=$((480 + sleepSecs))
+  done
+  if [ "$(date +%a)" = "Sun" ] || [ "$(date +%a)" = "Sat" ]; then
+    sleepSecs=$((300 + sleepSecs))
+  fi
+  run sleep "${sleepSecs}"
 done
