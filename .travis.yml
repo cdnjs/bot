@@ -1,0 +1,28 @@
+---
+
+language: node_js
+
+node_js:
+  - "8"
+
+git:
+  depth: 10
+  submodules:
+    false
+
+jobs:
+  include:
+    - stage: Static Test
+      env:
+        - test: Editor Config check
+      install:
+        - npm i -g eclint
+      script:
+        - eclint check
+    - stage: Static Test
+      env:
+        - test: shfmt check
+      script:
+        - docker run -it --rm -v "$(pwd)":/sh -w /sh peterdavehello/shfmt:2.5.1 shfmt -sr -i 2 -l -w -ci .
+        - git diff --color
+        - git diff --stat=220 --color --exit-code
