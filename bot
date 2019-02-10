@@ -59,8 +59,8 @@ while true; do
   if [ "$(git log --oneline -1 origin/master)" != "$(git log --oneline -1 master)" ]; then
     run git rebase origin/master master
   fi
-  run timelimit -q -s 9 -t 180 -T 200 npm install --no-audit --prefix "${basePath}/autoupdate" && run "${basePath}/autoupdate/autoupdate.js" &
-  run timelimit -q -s 9 -t 180 -T 200 npm install --no-audit && run timelimit -q -s 9 -t 1200 -T 1230 ./auto-update.js run &
+  run timelimit -q -t 180 -T 200 npm install --no-audit --prefix "${basePath}/autoupdate" && run "${basePath}/autoupdate/autoupdate.js" &
+  run timelimit -q -t 180 -T 200 npm install --no-audit && run timelimit -q -t 1200 -T 1230 ./auto-update.js run &
   wait
   (autoadd)
   if [ "${CurrentCommit}" = "$(git log -1 --oneline)" ]; then
