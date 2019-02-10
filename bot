@@ -9,7 +9,7 @@ if [ -s "$NVM_DIR/nvm.sh" ] && ! command -v nvm &> /dev/null; then
 fi
 
 if command -v nvm &> /dev/null; then
-  nvm install 8
+  nvm install 10
   echo "nvm version: $(nvm --version)"
 fi
 
