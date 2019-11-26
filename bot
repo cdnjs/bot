@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
-. ~/.bashrc
+
+if [ -z "$BOT_LOG_FILE" ]; then
+  echo "BOT_LOG_FILE missing"
+  exit 1
+fi
+if [ -z "$BOT_BASE_PATH" ]; then
+  echo "BOT_BASE_PATH missing"
+  exit 1
+fi
+if [ -z "$BOT_CDNJS_CHECK_DIR" ]; then
+  echo "BOT_CDNJS_CHECK_DIR missing"
+  exit 1
+fi
+if [ -z "$BOT_CDNJS_NPM_TEMP" ]; then
+  echo "BOT_CDNJS_NPM_TEMP missing"
+  exit 1
+fi
 
 NVM_DIR="$HOME/.nvm"
-basePath="$HOME/repos/cdnjs"
 
 if [ -s "$NVM_DIR/nvm.sh" ] && ! command -v nvm &> /dev/null; then
   . "$NVM_DIR/nvm.sh" --no-use
@@ -16,24 +31,20 @@ fi
 echo "git($(command -v git)) version: $(git --version | awk '{print $3}')"
 echo "npm($(command -v npm)) version: $(npm --version)"
 echo "node($(command -v node)) version: $(node --version)"
+echo "BOT_LOG_FILE: $BOT_LOG_FILE"
+echo "BOT_BASE_PATH: $BOT_BASE_PATH"
+echo "BOT_CDNJS_CHECK_DIR: $BOT_CDNJS_CHECK_DIR"
+echo "BOT_CDNJS_NPM_TEMP: $BOT_CDNJS_NPM_TEMP"
 
 if [ "$1" = "debug" ]; then
   set -x
   export GIT_TRACE=true
 fi
 
-userName="PeterBot"
-userEmail="PeterBot@users.noreply.github.com"
-export GIT_AUTHOR_NAME="${userName}"
-export GIT_AUTHOR_EMAIL="${userEmail}"
-export GIT_COMMITTER_NAME="${userName}"
-export GIT_COMMITTER_EMAIL="${userEmail}"
-export GIT_SSH="$HOME/.ssh/ssh-git.sh"
-
-. "${basePath}/script/commonScript.sh" || exit
+. "${BOT_BASE_PATH}/script/commonScript.sh" || exit
 
 function log() {
-  echo "$@" >> "${basePath}/bot.log"
+  echo "$@" >> "${BOT_LOG_FILE}"
 }
 
 function print-log() {
@@ -49,7 +60,7 @@ while true; do
   cowsay "Hi, I'm cdnjs bot"
   StartTimestamp="$(date +%s)"
   print-log "Start time: $(date)"
-  cd "${basePath}/cdnjs"
+  cd "${BOT_BASE_PATH}/cdnjs"
   CurrentCommit="$(git log -1 --oneline)"
   if [ "$(git branch | command grep ^* | awk '{print $2}')" != "master" ]; then
     git checkout -f master
@@ -59,7 +70,7 @@ while true; do
   if [ "$(git log --oneline -1 origin/master)" != "$(git log --oneline -1 master)" ]; then
     run git rebase origin/master master
   fi
-  run timelimit -q -t 180 -T 200 npm install --no-audit --prefix "${basePath}/autoupdate" && run timelimit -q -t 1200 -T 1230 "${basePath}/autoupdate/autoupdate.js" &
+  run timelimit -q -t 180 -T 200 npm install --no-audit --prefix "${BOT_BASE_PATH}/autoupdate" && run timelimit -q -t 1200 -T 1230 "${BOT_BASE_PATH}/autoupdate/autoupdate.js" &
   run timelimit -q -t 180 -T 200 npm install --no-audit && run timelimit -q -t 1200 -T 1230 ./auto-update.js run &
   wait
   (autoadd)
@@ -88,7 +99,7 @@ while true; do
     run git status
   fi
   print-log "Clean up ..."
-  rm -rf /run/shm/cdnjsCheck/ /run/shm/cdnjs_NPM_temp/
+  rm -rf $BOT_CDNJS_CHECK_DIR $BOT_CDNJS_NPM_TEMP
   EndTimestamp="$(date +%s)"
   spent="$((EndTimestamp - StartTimestamp))"
   echo -e "\\nTotal time spent for this build is _${spent}_ second(s)\\n"
