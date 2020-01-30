@@ -71,7 +71,7 @@ while true; do
     run git rebase origin/master master
   fi
   run timelimit -q -t 180 -T 200 npm install --no-audit --prefix "${BOT_BASE_PATH}/autoupdate" && run timelimit -q -t 1200 -T 1230 "${BOT_BASE_PATH}/autoupdate/autoupdate.js" &
-  run timelimit -q -t 180 -T 200 npm install --no-audit && run timelimit -q -t 1200 -T 1230 ./auto-update.js run &
+  run timelimit -q -t 180 -T 200 npm install --no-audit && run timelimit -q -t 1200 -T 1230 node --max-old-space-size=8192 ./auto-update.js run &
   wait
   (autoadd)
   if [ "${CurrentCommit}" = "$(git log -1 --oneline)" ]; then
