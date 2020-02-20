@@ -58,11 +58,14 @@ fi
 
 while true; do
   # Prevent the bot to run when another bot is already running
-  if test -f "/run/cdnjs-bot.pid"; then
-    echo "/run/cdnjs-bot.pid exist; waiting"
+  cdnjsBot2Status=$(systemctl is-active cdnjs-bot2)
+  if [ "$cdnjsBot2Status" == "active" ]; then
+    echo "cdnjs-bot2 is running; waiting"
     sleep 60
     continue
   fi
+
+  touch /run/cdnjs-bot.lock
 
   cowsay "Hi, I'm cdnjs bot"
   StartTimestamp="$(date +%s)"
@@ -119,5 +122,7 @@ while true; do
   if [ "$(date +%a)" = "Sun" ] || [ "$(date +%a)" = "Sat" ]; then
     sleepSecs=$((300 + sleepSecs))
   fi
+
+  rm /run/cdnjs-bot.lock
   run sleep "${sleepSecs}"
 done
