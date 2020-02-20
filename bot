@@ -65,7 +65,7 @@ while true; do
     continue
   fi
 
-  touch /run/cdnjs-bot.lock
+  touch $BOT_BASE_PATH/cdnjs-bot.lock
 
   cowsay "Hi, I'm cdnjs bot"
   StartTimestamp="$(date +%s)"
@@ -123,6 +123,6 @@ while true; do
     sleepSecs=$((300 + sleepSecs))
   fi
 
-  rm /run/cdnjs-bot.lock
+  rm $BOT_BASE_PATH/cdnjs-bot.lock
   run sleep "${sleepSecs}"
 done
