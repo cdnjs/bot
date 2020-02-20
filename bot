@@ -57,6 +57,13 @@ if ! type cowsay &> /dev/null; then
 fi
 
 while true; do
+  # Prevent the bot to run when another bot is already running
+  if test -f "/run/cdnjs-bot.pid"; then
+    echo "/run/cdnjs-bot.pid exist; waiting"
+    sleep 60
+    continue
+  fi
+
   cowsay "Hi, I'm cdnjs bot"
   StartTimestamp="$(date +%s)"
   print-log "Start time: $(date)"
